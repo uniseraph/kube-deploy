@@ -21,6 +21,9 @@ kube::bootstrap::bootstrap_daemon() {
 
   kube::log::status "Launching docker bootstrap..."
 
+
+  modprobe overlay
+
   docker daemon \
     -H ${BOOTSTRAP_DOCKER_SOCK} \
     -p /var/run/docker-bootstrap.pid \
@@ -29,6 +32,7 @@ kube::bootstrap::bootstrap_daemon() {
     --bridge=none \
     --graph=/var/lib/docker-bootstrap \
     --exec-root=/var/run/docker-bootstrap \
+    -s overlay \
       2> /var/log/docker-bootstrap.log \
       1> /dev/null &
 
@@ -108,6 +112,8 @@ kube::bootstrap::restart_docker_systemd(){
 kube::helpers::replace_mtu_bip(){
   local DOCKER_CONF=$1
   local SEARCH_FOR=$2
+
+  sed  -e ':a;N;$ s/\\\n/ /g;ba' -i $DOCKER_CONF
 
   # Assuming is a $SEARCH_FOR statement already, and we should append the options if they do not exist
   if [[ -z $(grep -- "--mtu=" $DOCKER_CONF) ]]; then
