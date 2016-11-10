@@ -244,6 +244,9 @@ kube::multinode::start_k8s_worker() {
       --cluster-domain=cluster.local \
       ${CNI_ARGS} \
       ${CONTAINERIZED_FLAG} \
+      --cadvisor-port=4194 \
+      --storage-driver-db="cadvisor" \
+      --storage-driver-host="localhost:8086" \
       --hostname-override=${IP_ADDRESS} \
       --v=2
 }
